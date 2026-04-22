@@ -1,12 +1,16 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { loadBooks, Book } from "@/lib/books";
-import AppSidebar, { Filters } from "@/components/AppSidebar";
-import BookCard from "@/components/BookCard";
+import SidebarNav, { PageId } from "@/components/SidebarNav";
+import HomePage from "@/components/pages/HomePage";
+import FindBooksPage from "@/components/pages/FindBooksPage";
+import FaqPage from "@/components/pages/FaqPage";
+import DashboardPage from "@/components/pages/DashboardPage";
+import AboutPage from "@/components/pages/AboutPage";
 
 const Index = () => {
   const [books, setBooks] = useState<Book[]>([]);
-  const [filters, setFilters] = useState<Filters>({ search: "", genre: "", quality: "" });
   const [loading, setLoading] = useState(true);
+  const [activePage, setActivePage] = useState<PageId>("home");
 
   useEffect(() => {
     loadBooks().then((data) => {
@@ -15,74 +19,30 @@ const Index = () => {
     });
   }, []);
 
-  const filtered = useMemo(() => {
-    return books.filter((b) => {
-      const matchSearch =
-        !filters.search ||
-        b.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-        b.author.toLowerCase().includes(filters.search.toLowerCase());
-      const matchGenre = !filters.genre || b.genre === filters.genre;
-      const matchQuality = !filters.quality || b.quality === filters.quality;
-      return matchSearch && matchGenre && matchQuality;
-    });
-  }, [books, filters]);
-
-  const stats = useMemo(() => {
-    const genres = new Set(books.map((b) => b.genre));
-    const authors = new Set(books.map((b) => b.author));
-    return { total: books.length, genres: genres.size, authors: authors.size };
-  }, [books]);
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="text-lg text-muted-foreground">📖 Loading the library...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen">
-      <AppSidebar books={books} onFilterChange={setFilters} />
+      <SidebarNav activePage={activePage} onNavigate={setActivePage} />
+      <main className="flex-1 overflow-y-auto p-8">
+        {activePage === "home" && <HomePage books={books} />}
+        {activePage === "find" && <FindBooksPage books={books} />}
+        {activePage === "faq" && <FaqPage />}
+        {activePage === "dashboard" && <DashboardPage books={books} />}
+        {activePage === "about" && <AboutPage />}
 
-      <main className="flex-1 overflow-y-auto">
-        {/* Header */}
-        <header className="border-b border-border bg-secondary px-8 py-6">
-          <h1 className="text-3xl font-bold text-secondary-foreground">
-            BookEnds UAE
-          </h1>
-          <p className="mt-1 text-sm text-secondary-foreground/70">
-            UAE's largest online used book platform
+        {/* Footer */}
+        <div className="mt-12 border-t border-border pt-6 text-center text-sm text-muted-foreground">
+          <p>📖 Every book is a new adventure waiting to begin 📖</p>
+          <p className="mt-1 text-xs">
+            © 2024 BookEnds UAE | UAE's largest online used book platform
           </p>
-        </header>
-
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 border-b border-border px-8 py-4">
-          {[
-            { label: "Books", value: stats.total },
-            { label: "Genres", value: stats.genres },
-            { label: "Authors", value: stats.authors },
-          ].map((s) => (
-            <div key={s.label} className="rounded-lg bg-accent p-3 text-center">
-              <p className="text-2xl font-bold text-primary">{s.value}</p>
-              <p className="text-xs text-muted-foreground">{s.label}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Book Grid */}
-        <div className="p-8">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-heading text-xl font-semibold text-secondary">
-              {filters.search || filters.genre || filters.quality
-                ? `Results (${filtered.length})`
-                : `All Books (${filtered.length})`}
-            </h2>
-          </div>
-
-          {loading ? (
-            <p className="py-12 text-center text-muted-foreground">Loading books…</p>
-          ) : filtered.length === 0 ? (
-            <p className="py-12 text-center text-muted-foreground">No books match your filters.</p>
-          ) : (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {filtered.map((book) => (
-                <BookCard key={book.sku} book={book} />
-              ))}
-            </div>
-          )}
         </div>
       </main>
     </div>
