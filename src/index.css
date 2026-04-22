@@ -21,17 +21,17 @@
     --secondary: 192 100% 15%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 187 30% 95%;
+    --muted: 187 20% 96%;
     --muted-foreground: 192 30% 40%;
 
-    --accent: 187 100% 95%;
+    --accent: 187 60% 93%;
     --accent-foreground: 192 100% 15%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 187 20% 90%;
-    --input: 187 20% 90%;
+    --border: 187 15% 90%;
+    --input: 187 15% 90%;
     --ring: 187 100% 37%;
 
     --radius: 0.5rem;
@@ -44,9 +44,6 @@
     --sidebar-accent-foreground: 0 0% 95%;
     --sidebar-border: 192 60% 25%;
     --sidebar-ring: 187 100% 37%;
-
-    --font-heading: 'Playfair Display', serif;
-    --font-body: 'Inter', sans-serif;
   }
 }
 
@@ -56,11 +53,11 @@
   }
 
   body {
-    @apply bg-background text-foreground font-body;
-    font-family: var(--font-body);
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
   }
 
   h1, h2, h3, h4 {
-    font-family: var(--font-heading);
+    font-family: 'Playfair Display', serif;
   }
 }
